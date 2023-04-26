@@ -3,6 +3,7 @@ package com.ll.simpleDb;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SimpleDb {
     private final Connection connection;
@@ -21,5 +22,14 @@ public class SimpleDb {
     }
 
     public void setDevMode(boolean mode) {
+    }
+
+    public void run(String sql) {
+        try {
+            Statement statement = connection.createStatement();
+            statement.executeUpdate(sql);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
