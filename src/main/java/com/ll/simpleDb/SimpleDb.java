@@ -21,6 +21,10 @@ public class SimpleDb {
     public void setDevMode(boolean mode) {
     }
 
+    public Sql genSql() {
+        return new Sql(this);
+    }
+
     public void run(String sql, Object... args) {
         System.out.println("== rawSql ==");
         System.out.println(sql);
@@ -34,6 +38,26 @@ public class SimpleDb {
 
             // 쿼리 실행
             preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long runInsertAndGetGeneratedKey(String sql, Object... args) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            for (int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i + 1, args[i]);
+            }
+
+            preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+
+            if (generatedKeys.next()) {
+                return generatedKeys.getLong(1);
+            } else {
+                throw new RuntimeException("No generated key was returned after insert");
+            }
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
