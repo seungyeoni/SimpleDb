@@ -1,9 +1,6 @@
 package com.ll.simpleDb;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class SimpleDb {
     private final Connection connection;
@@ -24,10 +21,19 @@ public class SimpleDb {
     public void setDevMode(boolean mode) {
     }
 
-    public void run(String sql) {
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate(sql);
+    public void run(String sql, Object... args) {
+        System.out.println("== rawSql ==");
+        System.out.println(sql);
+        System.out.println();
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            for (int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i + 1, args[i]);
+            }
+
+            // 쿼리 실행
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
