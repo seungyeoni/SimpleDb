@@ -23,6 +23,11 @@ public class Sql {
 
     public long insert() {
         String sql = sqlBuilder.toString();
-        return simpleDb.runInsertAndGetGeneratedKey(sql, params.toArray());
+        return simpleDb.runInsert(sql, params.toArray());
+    }
+
+    public long update() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runUpdate(sql, params.toArray());
     }
 }
