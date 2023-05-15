@@ -179,8 +179,18 @@ public class SimpleDb {
         return selectSql(sql, args, cls);
     }
 
-    public Map<String, Object> runSelectRow(String sql, Object[] args) {
-        List<Map<String, Object>> rows = selectSql(sql, args);
+    public <T> T runSelectRow(String sql, Object[] args, Class<T> cls) {
+        List<T> rows = runSelectRows(sql, args, cls);
+
+        if (rows.isEmpty()) {
+            return null;
+        }
+
+        return rows.get(0);
+    }
+
+    public <T> T runSelectRow(String sql, Object[] args) {
+        List<T> rows = runSelectRows(sql, args, (Class<T>) Map.class);
 
         if (rows.isEmpty()) {
             return null;

@@ -63,6 +63,11 @@ public class Sql {
         return simpleDb.runSelectRows(sql, params.toArray(), cls);
     }
 
+    public <T> T selectRow(Class<T> cls) {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectRow(sql, params.toArray(), (Class<T>) cls);
+    }
+
     public Map<String, Object> selectRow() {
         String sql = sqlBuilder.toString();
         return simpleDb.runSelectRow(sql, params.toArray());
