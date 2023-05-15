@@ -1,6 +1,10 @@
 package com.ll.simpleDb;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class SimpleDb {
     private final Connection connection;
@@ -77,5 +81,42 @@ public class SimpleDb {
     // runUpdate 메서드 추가
     public long runUpdate(String sql, Object[] args) {
         return executeSql(sql, args);
+    }
+
+    // SimpleDb 클래스 내부에 추가되어야 합니다.
+    public List<Map<String, Object>> runSelectRows(String sql, Object[] args) {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        if (devMode) {
+            System.out.println("== rawSql ==");
+            System.out.println(sql);
+            System.out.println();
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            for (int i = 0; i < args.length; i++) {
+                preparedStatement.setObject(i + 1, args[i]);
+            }
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int columnCount = resultSetMetaData.getColumnCount();
+
+            while (resultSet.next()) {
+                Map<String, Object> row = new HashMap<>();
+
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnName = resultSetMetaData.getColumnLabel(i);
+                    Object columnValue = resultSet.getObject(i);
+                    row.put(columnName, columnValue);
+                }
+
+                result.add(row);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
     }
 }

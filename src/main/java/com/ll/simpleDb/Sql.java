@@ -3,6 +3,7 @@ package com.ll.simpleDb;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class Sql {
     private final SimpleDb simpleDb;
@@ -34,5 +35,10 @@ public class Sql {
     public long delete() {
         String sql = sqlBuilder.toString();
         return simpleDb.runUpdate(sql, params.toArray());
+    }
+
+    public List<Map<String, Object>> selectRows() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectRows(sql, params.toArray());
     }
 }
