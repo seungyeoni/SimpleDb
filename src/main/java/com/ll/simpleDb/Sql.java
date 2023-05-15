@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Sql {
     private final SimpleDb simpleDb;
@@ -20,6 +22,20 @@ public class Sql {
     public Sql append(String sqlPart, Object... args) {
         sqlBuilder.append(sqlPart).append(" ");
         Collections.addAll(params, args);
+        return this;
+    }
+
+    public Sql appendIn(String sqlPart, Object... args) {
+        String replacement = IntStream
+                .range(0, args.length)
+                .boxed()
+                .map(i -> "?")
+                .collect(Collectors.joining(", "));
+
+        sqlPart = sqlPart.replace("?", replacement);
+        sqlBuilder.append(sqlPart).append(" ");
+        Collections.addAll(params, args);
+
         return this;
     }
 
