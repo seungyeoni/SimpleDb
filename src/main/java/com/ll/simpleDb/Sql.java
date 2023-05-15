@@ -30,4 +30,9 @@ public class Sql {
         String sql = sqlBuilder.toString();
         return simpleDb.runUpdate(sql, params.toArray());
     }
+
+    public long delete() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runUpdate(sql, params.toArray());
+    }
 }
