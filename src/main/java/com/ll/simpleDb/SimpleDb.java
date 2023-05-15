@@ -1,5 +1,11 @@
 package com.ll.simpleDb;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,6 +18,11 @@ import java.util.regex.Pattern;
 public class SimpleDb {
     private final Connection connection;
     private boolean devMode;
+    private ObjectMapper om = new ObjectMapper() {{
+        registerModule(new JavaTimeModule());
+        setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }};
 
     public SimpleDb(String host, String username, String password, String dbName) {
         int port = 3306;
@@ -107,8 +118,8 @@ public class SimpleDb {
         }
     }
 
-    private List<Map<String, Object>> selectSql(String sql, Object[] args) {
-        List<Map<String, Object>> result;
+    private <T> List<T> selectSql(String sql, Object[] args, Class<T> cls) {
+        List<T> result;
 
         printRawSql(sql, args);
 
@@ -116,7 +127,7 @@ public class SimpleDb {
             setPreparedStatementParameters(preparedStatement, args);
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            result = extractResultRows(resultSet);
+            result = extractResultRows(resultSet, cls);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -124,8 +135,12 @@ public class SimpleDb {
         return result;
     }
 
-    private List<Map<String, Object>> extractResultRows(ResultSet resultSet) throws SQLException {
-        List<Map<String, Object>> result = new ArrayList<>();
+    private <T> List<T> selectSql(String sql, Object[] args) {
+        return selectSql(sql, args, (Class<T>) Map.class);
+    }
+
+    private <T> List<T> extractResultRows(ResultSet resultSet, Class<T> cls) throws SQLException {
+        List<T> rows = new ArrayList<>();
         ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
         int columnCount = resultSetMetaData.getColumnCount();
 
@@ -138,10 +153,14 @@ public class SimpleDb {
                 row.put(columnName, columnValue);
             }
 
-            result.add(row);
+            if (cls.getSimpleName().equals("Map")) {
+                rows.add((T) row);
+            } else {
+                rows.add(om.convertValue(row, cls));
+            }
         }
 
-        return result;
+        return rows;
     }
 
     public void run(String sql, Object... args) {
@@ -156,8 +175,8 @@ public class SimpleDb {
         return executeSql(sql, args, Statement.NO_GENERATED_KEYS);
     }
 
-    public List<Map<String, Object>> runSelectRows(String sql, Object[] args) {
-        return selectSql(sql, args);
+    public <T> List<T> runSelectRows(String sql, Object[] args, Class<T> cls) {
+        return selectSql(sql, args, cls);
     }
 
     public Map<String, Object> runSelectRow(String sql, Object[] args) {

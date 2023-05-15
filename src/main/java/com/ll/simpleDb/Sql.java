@@ -54,9 +54,13 @@ public class Sql {
         return simpleDb.runUpdate(sql, params.toArray());
     }
 
-    public List<Map<String, Object>> selectRows() {
+    public <T> List<T> selectRows() {
+        return selectRows((Class<T>) Map.class);
+    }
+
+    public <T> List<T> selectRows(Class<T> cls) {
         String sql = sqlBuilder.toString();
-        return simpleDb.runSelectRows(sql, params.toArray());
+        return simpleDb.runSelectRows(sql, params.toArray(), cls);
     }
 
     public Map<String, Object> selectRow() {
