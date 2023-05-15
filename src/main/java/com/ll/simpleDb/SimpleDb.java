@@ -139,13 +139,32 @@ public class SimpleDb {
         return rows.get(0);
     }
 
-    public LocalDateTime runSelectDatetime(String sql, Object[] args) {
+    private Object runSelectObject(String sql, Object[] args) {
         Map<String, Object> row = runSelectRow(sql, args);
 
         if (row == null) {
             return null;
         }
 
-        return (LocalDateTime) row.values().iterator().next();
+        return row.entrySet().iterator().next().getValue();
+    }
+
+    public LocalDateTime runSelectDatetime(String sql, Object[] args) {
+        return (LocalDateTime) runSelectObject(sql, args);
+    }
+
+    public Long runSelectLong(String sql, Object[] args) {
+        return (Long) runSelectObject(sql, args);
+    }
+
+    public String runSelectString(String sql, Object[] args) {
+        return (String) runSelectObject(sql, args);
+    }
+
+    public Boolean runSelectBoolean(String sql, Object[] args) {
+        Object bool = runSelectObject(sql, args);
+
+        if (bool instanceof Integer) return (Integer) bool == 1;
+        return (Boolean) bool;
     }
 }

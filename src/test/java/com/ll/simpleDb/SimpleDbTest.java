@@ -182,7 +182,8 @@ public class SimpleDbTest {
     }
 
     @Test
-    public void selectDatetime() {
+    @DisplayName("selectDatetime")
+    public void t006() {
         Sql sql = simpleDb.genSql();
         /*
         == rawSql ==
@@ -195,5 +196,92 @@ public class SimpleDbTest {
         long diff = ChronoUnit.SECONDS.between(datetime, LocalDateTime.now());
 
         assertThat(diff).isLessThanOrEqualTo(1L);
+    }
+
+    @Test
+    @DisplayName("selectLong")
+    public void t007() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT id
+        FROM article
+        WHERE id = 1
+        */
+        sql.append("SELECT id")
+                .append("FROM article")
+                .append("WHERE id = 1");
+
+        Long id = sql.selectLong();
+
+        assertThat(id).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("selectString")
+    public void t008() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT title
+        FROM article
+        WHERE id = 1
+        */
+        sql.append("SELECT title")
+                .append("FROM article")
+                .append("WHERE id = 1");
+
+        String title = sql.selectString();
+
+        assertThat(title).isEqualTo("제목1");
+    }
+
+    @Test
+    @DisplayName("selectBoolean")
+    public void t009() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT isBlind
+        FROM article
+        WHERE id = 1
+        */
+        sql.append("SELECT isBlind")
+                .append("FROM article")
+                .append("WHERE id = 1");
+
+        Boolean isBlind = sql.selectBoolean();
+
+        assertThat(isBlind).isEqualTo(false);
+    }
+
+    @Test
+    @DisplayName("selectBoolean, 2nd")
+    public void t010() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT 1 = 1
+        */
+        sql.append("SELECT 1 = 1");
+
+        Boolean isBlind = sql.selectBoolean();
+
+        assertThat(isBlind).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("selectBoolean, 3rd")
+    public void t011() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT 1 = 0
+        */
+        sql.append("SELECT 1 = 0");
+
+        Boolean isBlind = sql.selectBoolean();
+
+        assertThat(isBlind).isEqualTo(false);
     }
 }

@@ -52,4 +52,19 @@ public class Sql {
         String sql = sqlBuilder.toString();
         return simpleDb.runSelectDatetime(sql, params.toArray());
     }
+
+    public Long selectLong() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectLong(sql, params.toArray());
+    }
+
+    public String selectString() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectString(sql, params.toArray());
+    }
+
+    public Boolean selectBoolean() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectBoolean(sql, params.toArray());
+    }
 }
