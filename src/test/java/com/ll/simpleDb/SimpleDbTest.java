@@ -1,18 +1,17 @@
 package com.ll.simpleDb;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
 
 @TestInstance(PER_CLASS)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class SimpleDbTest {
     private SimpleDb simpleDb;
 
@@ -33,7 +32,7 @@ public class SimpleDbTest {
     private void createArticleTable() {
         simpleDb.run("DROP TABLE IF EXISTS article");
 
-        simpleDb.run("""                                                
+        simpleDb.run("""
                 CREATE TABLE article (
                     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
                     PRIMARY KEY(id),
@@ -68,7 +67,8 @@ public class SimpleDbTest {
     }
 
     @Test
-    public void insert() {
+    @DisplayName("insert")
+    public void t001() {
         Sql sql = simpleDb.genSql();
         /*
         == rawSql ==
@@ -78,11 +78,7 @@ public class SimpleDbTest {
         title = '제목 new' ,
         body = '내용 new'
         */
-        sql.append("INSERT INTO article")
-                .append("SET createdDate = NOW()")
-                .append(", modifiedDate = NOW()")
-                .append(", title = ?", "제목 new")
-                .append(", body = ?", "내용 new");
+        sql.append("INSERT INTO article").append("SET createdDate = NOW()").append(", modifiedDate = NOW()").append(", title = ?", "제목 new").append(", body = ?", "내용 new");
 
         long newId = sql.insert(); // AUTO_INCREMENT 에 의해서 생성된 주키 리턴
 
@@ -90,7 +86,8 @@ public class SimpleDbTest {
     }
 
     @Test
-    public void update() {
+    @DisplayName("update")
+    public void t002() {
         Sql sql = simpleDb.genSql();
 
         // id가 0, 1, 2, 3인 글 수정
@@ -102,10 +99,7 @@ public class SimpleDbTest {
         SET title = '제목 new'
         WHERE id IN ('0', '1', '2', '3')
         */
-        sql
-                .append("UPDATE article")
-                .append("SET title = ?", "제목 new")
-                .append("WHERE id IN (?, ?, ?, ?)", 0, 1, 2, 3);
+        sql.append("UPDATE article").append("SET title = ?", "제목 new").append("WHERE id IN (?, ?, ?, ?)", 0, 1, 2, 3);
 
         // 수정된 row 개수
         long affectedRowsCount = sql.update();
@@ -114,7 +108,8 @@ public class SimpleDbTest {
     }
 
     @Test
-    public void delete() {
+    @DisplayName("delete")
+    public void t003() {
         Sql sql = simpleDb.genSql();
 
         // id가 0, 1, 3인 글 삭제
@@ -124,9 +119,7 @@ public class SimpleDbTest {
         DELETE FROM article
         WHERE id IN ('0', '1', '3')
         */
-        sql.append("DELETE")
-                .append("FROM article")
-                .append("WHERE id IN (?, ?, ?)", 0, 1, 3);
+        sql.append("DELETE").append("FROM article").append("WHERE id IN (?, ?, ?)", 0, 1, 3);
 
         // 삭제된 row 개수
         long affectedRowsCount = sql.delete();
@@ -135,7 +128,8 @@ public class SimpleDbTest {
     }
 
     @Test
-    public void selectRows() {
+    @DisplayName("selectRows")
+    public void t004() {
         Sql sql = simpleDb.genSql();
         /*
         == rawSql ==
@@ -161,5 +155,28 @@ public class SimpleDbTest {
             assertThat(articleRow.get("modifiedDate")).isNotNull();
             assertThat(articleRow.get("isBlind")).isEqualTo(false);
         });
+    }
+
+    @Test
+    @DisplayName("selectRow")
+    public void t005() {
+        Sql sql = simpleDb.genSql();
+        /*
+        == rawSql ==
+        SELECT *
+        FROM article
+        WHERE id = 1
+        */
+        sql.append("SELECT * FROM article WHERE id = 1");
+        Map<String, Object> articleRow = sql.selectRow();
+
+        assertThat(articleRow.get("id")).isEqualTo(1L);
+        assertThat(articleRow.get("title")).isEqualTo("제목1");
+        assertThat(articleRow.get("body")).isEqualTo("내용1");
+        assertThat(articleRow.get("createdDate")).isInstanceOf(LocalDateTime.class);
+        assertThat(articleRow.get("createdDate")).isNotNull();
+        assertThat(articleRow.get("modifiedDate")).isInstanceOf(LocalDateTime.class);
+        assertThat(articleRow.get("modifiedDate")).isNotNull();
+        assertThat(articleRow.get("isBlind")).isEqualTo(false);
     }
 }

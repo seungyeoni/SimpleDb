@@ -41,4 +41,9 @@ public class Sql {
         String sql = sqlBuilder.toString();
         return simpleDb.runSelectRows(sql, params.toArray());
     }
+
+    public Map<String, Object> selectRow() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectRow(sql, params.toArray());
+    }
 }

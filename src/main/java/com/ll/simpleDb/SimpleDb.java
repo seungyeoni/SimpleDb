@@ -127,4 +127,14 @@ public class SimpleDb {
     public List<Map<String, Object>> runSelectRows(String sql, Object[] args) {
         return selectSql(sql, args);
     }
+
+    public Map<String, Object> runSelectRow(String sql, Object[] array) {
+        List<Map<String, Object>> rows = selectSql(sql, array);
+
+        if (rows.isEmpty()) {
+            return null;
+        }
+
+        return rows.get(0);
+    }
 }
