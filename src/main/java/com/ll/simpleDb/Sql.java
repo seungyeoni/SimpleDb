@@ -83,4 +83,24 @@ public class Sql {
         String sql = sqlBuilder.toString();
         return simpleDb.runSelectBoolean(sql, params.toArray());
     }
+
+    public List<Long> selectLongs() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectLongs(sql, params.toArray());
+    }
+
+    public List<String> selectStrings() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectStrings(sql, params.toArray());
+    }
+
+    public List<LocalDateTime> selectDatetimes() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectDatetimes(sql, params.toArray());
+    }
+
+    public List<Boolean> selectBooleans() {
+        String sql = sqlBuilder.toString();
+        return simpleDb.runSelectBooleans(sql, params.toArray());
+    }
 }

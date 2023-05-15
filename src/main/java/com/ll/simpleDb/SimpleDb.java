@@ -167,4 +167,51 @@ public class SimpleDb {
         if (bool instanceof Integer) return (Integer) bool == 1;
         return (Boolean) bool;
     }
+
+    public List<Long> runSelectLongs(String sql, Object[] args) {
+        List<Map<String, Object>> rows = selectSql(sql, args);
+        List<Long> result = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            result.add((Long) row.entrySet().iterator().next().getValue());
+        }
+
+        return result;
+    }
+
+    public List<String> runSelectStrings(String sql, Object[] args) {
+        List<Map<String, Object>> rows = selectSql(sql, args);
+        List<String> result = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            result.add((String) row.entrySet().iterator().next().getValue());
+        }
+
+        return result;
+    }
+
+    public List<LocalDateTime> runSelectDatetimes(String sql, Object[] args) {
+        List<Map<String, Object>> rows = selectSql(sql, args);
+        List<LocalDateTime> result = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            result.add((LocalDateTime) row.entrySet().iterator().next().getValue());
+        }
+
+        return result;
+    }
+
+    public List<Boolean> runSelectBooleans(String sql, Object[] args) {
+        List<Map<String, Object>> rows = selectSql(sql, args);
+        List<Boolean> result = new ArrayList<>();
+
+        for (Map<String, Object> row : rows) {
+            Object bool = row.entrySet().iterator().next().getValue();
+
+            if (bool instanceof Integer) bool = (Integer) bool == 1;
+            result.add((Boolean) bool);
+        }
+
+        return result;
+    }
 }
