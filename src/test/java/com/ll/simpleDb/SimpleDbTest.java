@@ -419,7 +419,7 @@ public class SimpleDbTest {
 
     // 테스트 메서드를 정의하고, 테스트 이름을 지정합니다.
     @Test
-    @DisplayName("Multi-threading test")
+    @DisplayName("use in multi threading")
     public void t017() throws InterruptedException {
         // 쓰레드 풀의 크기를 정의합니다.
         int numberOfThreads = 10;
@@ -479,5 +479,61 @@ public class SimpleDbTest {
 
         // 성공 카운터가 쓰레드 수와 동일한지 확인합니다.
         assertThat(successCounter.get()).isEqualTo(numberOfThreads);
+    }
+
+    @Test
+    @DisplayName("rollback")
+    public void t018() {
+        // SimpleDB에서 SQL 객체를 생성합니다.
+        long oldCount = simpleDb.genSql()
+                .append("SELECT COUNT(*)")
+                .append("FROM article")
+                .selectLong();
+
+        // 트랜잭션을 시작합니다.
+        simpleDb.startTransaction();
+
+        simpleDb.genSql()
+                .append("INSERT INTO article ")
+                .append("(createdDate, modifiedDate, title, body)")
+                .appendIn("VALUES (NOW(), NOW(), ?)", "새 제목", "새 내용")
+                .insert();
+
+        simpleDb.rollback();
+
+        long newCount = simpleDb.genSql()
+                .append("SELECT COUNT(*)")
+                .append("FROM article")
+                .selectLong();
+
+        assertThat(newCount).isEqualTo(oldCount);
+    }
+
+    @Test
+    @DisplayName("commit")
+    public void t019() {
+        // SimpleDB에서 SQL 객체를 생성합니다.
+        long oldCount = simpleDb.genSql()
+                .append("SELECT COUNT(*)")
+                .append("FROM article")
+                .selectLong();
+
+        // 트랜잭션을 시작합니다.
+        simpleDb.startTransaction();
+
+        simpleDb.genSql()
+                .append("INSERT INTO article ")
+                .append("(createdDate, modifiedDate, title, body)")
+                .appendIn("VALUES (NOW(), NOW(), ?)", "새 제목", "새 내용")
+                .insert();
+
+        simpleDb.commit();
+
+        long newCount = simpleDb.genSql()
+                .append("SELECT COUNT(*)")
+                .append("FROM article")
+                .selectLong();
+
+        assertThat(newCount).isEqualTo(oldCount + 1);
     }
 }

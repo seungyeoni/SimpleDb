@@ -301,4 +301,31 @@ public class SimpleDb {
 
         return result;
     }
+
+    public void startTransaction() {
+        // 트랜잭션 시작을 위한 코드를 작성합니다.
+        try {
+            getConnection().setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void rollback() {
+        // 롤백을 위한 코드를 작성합니다.
+        try {
+            getConnection().rollback();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void commit() {
+        // 커밋을 위한 코드를 작성합니다.
+        try {
+            getConnection().commit();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
